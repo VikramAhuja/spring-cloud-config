@@ -17,6 +17,7 @@
 package org.springframework.cloud.config.server;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.eclipse.jgit.junit.MockSystemReader;
 import org.eclipse.jgit.util.SystemReader;
@@ -64,9 +65,10 @@ public class BootstrapConfigServerIntegrationTests {
 	public void contextLoads() {
 		Environment environment = new TestRestTemplate().getForObject(
 				"http://localhost:" + this.port + "/foo/development/", Environment.class);
-		assertThat(environment.getPropertySources().isEmpty()).isFalse();
-		assertThat(environment.getPropertySources().get(0).getSource().get("info.foo"))
-				.isEqualTo("bar");
+		Object value = environment.getPropertySources().get(0).getSource().get("info.foo");
+		assertThat(value).isNotNull().isInstanceOf(Map.class);
+		Map map = (Map) value;
+		assertThat(map).containsEntry("value", "bar");
 	}
 
 	@Test
